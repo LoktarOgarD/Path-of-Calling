@@ -158,3 +158,38 @@ Ein interaktives Selbstentwicklungs-Spiel, bei dem reale Aufgaben die Stärke de
 - Implementierung der XP-Logik
 - Quest-Generator
 - GUI für Test
+
+
+
+## Pantheon Details
+
+### Knight (Melancholic)
+- **Attribute:** Ehre, Pflicht, Ausdauer
+- **Hauptgott:** St. Michael (Christliche Tradition)
+- **Begründung:** Schutzpatron der Ritter, Symbol für Mut und Pflichtbewusstsein.
+- **Typische Aufgaben:** Hilfe für Bedürftige, Einhalten von Versprechen, Verteidigung der Schwachen.
+
+### Samurai (Phlegmatic)
+- **Attribute:** Disziplin, Fokus, Reinheit der Absichten
+- **Hauptgott:** Hachiman (Shinto)
+- **Alternative:** Fudo Myoo (Buddhistischer Hüter)
+- **Typische Aufgaben:** Meditation, tägliche Rituale, Kampfkunst, Kalligrafie.
+
+### Viking (Choleric)
+- **Attribute:** Stärke, Mut, Entschlossenheit
+- **Hauptgott:** Thor (Nordische Mythologie)
+- **Begründung:** Gott des Donners und des Kampfes, Symbol für rohe Kraft und Schutz.
+- **Typische Aufgaben:** Körperliche Herausforderungen, Wettkämpfe, Abenteuer.
+
+### Bard (Sanguine)
+- **Attribute:** Inspiration, Kreativität, soziale Bindungen
+- **Hauptgott:** Bragi (Nordische Mythologie)
+- **Begründung:** Gott der Poesie und Musik, Symbol für Ausdruckskraft und Diplomatie.
+- **Typische Aufgaben:** Musik, Geschichten erzählen, Netzwerken, soziale Events.
+
+
+## Diagramme
+![XP Flow](xp_flow.png)
+![Temperament Wheel](temperament_wheel.png)
+
+
