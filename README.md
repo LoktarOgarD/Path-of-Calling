@@ -2,6 +2,7 @@
 
 ## Überblick
 Ein interaktives Selbstentwicklungs-Spiel, bei dem reale Aufgaben die Stärke deines Charakters bestimmen.
+<img width="2244" height="1050" alt="JSON-Vorschau" src="https://github.com/user-attachments/assets/3e45db28-7277-4df5-aa50-15519587923e" />
 
 ---
 
@@ -208,8 +209,10 @@ Ein interaktives Selbstentwicklungs-Spiel, bei dem reale Aufgaben die Stärke de
 | Bard | Sanguine | Inspiration, Kreativität, soziale Bindungen | Hermes | Networking, Diplomatie, Reisen |
 
 ## Diagramme
-![XP Flow](xp_flow.png)
-![Temperament Wheel](temperament_wheel.png)
+![XP Flow]
+<img width="2244" height="1050" alt="JSON-Vorschau" src="https://github.com/user-attachments/assets/3e45db28-7277-4df5-aa50-15519587923e" />
+
+![Temperament Wheel](https://github.com/user-attachments/assets/04f6c3a8-525c-490d-beb9-10ead37deea6)
 
 
 
