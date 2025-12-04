@@ -148,44 +148,56 @@ Ein interaktives Selbstentwicklungs-Spiel, bei dem reale Aufgaben die Stärke de
 - XP-Logik: Passiv = 0 | Rede = 2.5 | Musik = 4.0
 
 ---
-## Pantheon-Beispiel: Samurai
-- Attribute: Disziplin, Ehre, Fokus, Pflicht
-- Hauptgott: Hachiman (Shinto)
-- Alternative: Fudo Myoo
-- Aufgaben: Meditation, tägliche Rituale, Kalligrafie, Kampfkunst
-
-## Nächste Schritte
-- Implementierung der XP-Logik
-- Quest-Generator
-- GUI für Test
-
-
-
-## Pantheon Details
+## Pantheon Details (Erweitert)
 
 ### Knight (Melancholic)
-- **Attribute:** Ehre, Pflicht, Ausdauer
 - **Hauptgott:** St. Michael (Christliche Tradition)
-- **Begründung:** Schutzpatron der Ritter, Symbol für Mut und Pflichtbewusstsein.
-- **Typische Aufgaben:** Hilfe für Bedürftige, Einhalten von Versprechen, Verteidigung der Schwachen.
+- **Symbolische Bedeutung:** Schutzpatron der Ritter, Verkörperung von Mut, Pflicht und Gerechtigkeit.
+- **Stärken:** Tapferkeit, Verteidigung der Schwachen, moralische Integrität.
+- **Typische Aufgaben:**
+  - "Schütze ein Dorf vor Angreifern"
+  - "Hilf einem Bedürftigen in Not"
+  - "Verteidige die Ehre eines Freundes"
+- **Quests:**
+  - "Organisiere eine Hilfsaktion für die Armen"
+  - "Trainiere Ausdauer und Geduld durch einen langen Marsch"
 
 ### Samurai (Phlegmatic)
-- **Attribute:** Disziplin, Fokus, Reinheit der Absichten
 - **Hauptgott:** Hachiman (Shinto)
-- **Alternative:** Fudo Myoo (Buddhistischer Hüter)
-- **Typische Aufgaben:** Meditation, tägliche Rituale, Kampfkunst, Kalligrafie.
+- **Symbolische Bedeutung:** Gott des Krieges und der Kampfkunst, Patron des Bushido (Weg des Kriegers).
+- **Stärken:** Disziplin, Fokus, Reinheit der Absichten.
+- **Typische Aufgaben:**
+  - "Meditation für geistige Klarheit"
+  - "Übe Kalligrafie für Präzision"
+  - "Trainiere eine Kampfkunst für Meisterschaft"
+- **Quests:**
+  - "Folge einem strengen Tagesritual"
+  - "Lerne eine neue Technik in der Kampfkunst"
 
 ### Viking (Choleric)
-- **Attribute:** Stärke, Mut, Entschlossenheit
 - **Hauptgott:** Thor (Nordische Mythologie)
-- **Begründung:** Gott des Donners und des Kampfes, Symbol für rohe Kraft und Schutz.
-- **Typische Aufgaben:** Körperliche Herausforderungen, Wettkämpfe, Abenteuer.
+- **Symbolische Bedeutung:** Gott des Donners und des Kampfes, Verkörperung von Stärke und Schutz.
+- **Stärken:** Mut, rohe Kraft, Entschlossenheit.
+- **Typische Aufgaben:**
+  - "Nimm an einem Wettkampf teil"
+  - "Bestehe eine körperliche Herausforderung"
+  - "Erkunde unbekannte Gebiete"
+- **Quests:**
+  - "Organisiere ein Training für Kraft und Ausdauer"
+  - "Stelle dich einem gefährlichen Gegner"
 
 ### Bard (Sanguine)
-- **Attribute:** Inspiration, Kreativität, soziale Bindungen
-- **Hauptgott:** Bragi (Nordische Mythologie)
-- **Begründung:** Gott der Poesie und Musik, Symbol für Ausdruckskraft und Diplomatie.
-- **Typische Aufgaben:** Musik, Geschichten erzählen, Netzwerken, soziale Events.
+- **Hauptgott:** Hermes (Griechische Mythologie)
+- **Symbolische Bedeutung:** Gott der Kommunikation, Reisenden, Handel und Diplomatie.
+- **Stärken:** Schnelligkeit, Verhandlungsgeschick, soziale Intelligenz.
+- **Typische Aufgaben:**
+  - "Networking bei einem Fest"
+  - "Vermittle Frieden zwischen zwei Parteien"
+  - "Reise und knüpfe neue Kontakte"
+- **Quests:**
+  - "Organisiere ein gesellschaftliches Ereignis"
+  - "Schließe einen Handel mit einem fremden Stamm"
+
 
 
 ## Diagramme
