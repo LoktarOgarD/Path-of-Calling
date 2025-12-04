@@ -199,9 +199,17 @@ Ein interaktives Selbstentwicklungs-Spiel, bei dem reale Aufgaben die Stärke de
   - "Schließe einen Handel mit einem fremden Stamm"
 
 
+## Übersichtstabelle
+| Klasse | Temperament | Attribute | Gott | Beispiel-Quests |
+|--------|-------------|-----------|------|------------------|
+| Knight | Melancholic | Ehre, Pflicht, Ausdauer | St. Michael | Hilf Bedürftigen, Verteidige die Schwachen |
+| Samurai | Phlegmatic | Disziplin, Fokus, Reinheit | Hachiman | Meditation, Kampfkunst, tägliche Rituale |
+| Viking | Choleric | Stärke, Mut, Entschlossenheit | Thor | Wettkämpfe, Abenteuer, körperliche Herausforderungen |
+| Bard | Sanguine | Inspiration, Kreativität, soziale Bindungen | Hermes | Networking, Diplomatie, Reisen |
 
 ## Diagramme
 ![XP Flow](xp_flow.png)
 ![Temperament Wheel](temperament_wheel.png)
+
 
 
