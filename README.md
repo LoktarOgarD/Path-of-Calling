@@ -2,9 +2,7 @@
 
 ## Überblick
 Ein interaktives Selbstentwicklungs-Spiel, bei dem reale Aufgaben die Stärke deines Charakters bestimmen.
-<img width="2244" height="1050" alt="JSON-Vorschau" src="https://github.com/user-attachments/assets/3e45db28-7277-4df5-aa50-15519587923e" />
-
----
+<img width="1536" height="1024" alt="Path Of Calling DIagrams" src="https://github.com/user-attachments/assets/c1c9e5ff-abe2-405d-b041-36cbc626d015" />
 
 ## Psychologischer Test: 20 Fragen
 
