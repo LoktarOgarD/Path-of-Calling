@@ -6,12 +6,10 @@ namespace PathOfCalling
     public class Game
     {
         private Player _player;
-
         private bool _running = true;
 
         public void Run()
         {
-            // Zentrale Spielschleife (Tag 2 Fokus: Menü)
             while (_running)
             {
                 ShowMainMenu();
@@ -35,8 +33,7 @@ namespace PathOfCalling
                     StartNewGame();
                     break;
                 case "2":
-                    // Platzhalter für Tag 4/5 (Save/Load)
-                    Console.WriteLine("Ladefunktion wird später implementiert.");
+                    Console.WriteLine("Ladefunktion wird in einem späteren Projekttag implementiert.");
                     Pause();
                     break;
                 case "3":
@@ -61,54 +58,36 @@ namespace PathOfCalling
             if (string.IsNullOrWhiteSpace(name))
                 name = "Wanderer";
 
-            // Archetyp wählen
-            var archetypes = ArchetypeRepository.GetAll();
-            Console.Clear();
-            Console.WriteLine("Wähle deinen Archetypen:\n");
-
-            for (int i = 0; i < archetypes.Count; i++)
-            {
-                var a = archetypes[i];
-                Console.WriteLine(
-                    $"{i + 1}) {a.Name} ({a.Temperament}) - {a.ShortDescription}");
-            }
-
-            Console.Write("\nAuswahl (Zahl): ");
-            string? choice = Console.ReadLine();
-            if (!int.TryParse(choice, out int index) ||
-                index < 1 || index > archetypes.Count)
-            {
-                Console.WriteLine("Ungültige Auswahl. Zurück zum Hauptmenü.");
-                Pause();
-                return;
-            }
-
-            var selected = archetypes[index - 1];
-
             _player = new Player
             {
                 Name = name,
-                ArchetypeId = selected.Id,
                 Level = 1
             };
 
-            PlayerArchetypeSetup.ApplyBaseStats(_player);
+            // Tag 3: Persönlichkeitstest führt zur Archetyp-Bestimmung
+            PersonalityTestService.RunPersonalityTestAndAssignArchetype(_player);
 
+            // Kurze Zusammenfassung
+            var arch = ArchetypeRepository.GetById(_player.ArchetypeId);
             Console.Clear();
-            Console.WriteLine($"Du bist nun ein(e) {selected.Name}.");
-            Console.WriteLine($"Gott / Patron: {selected.GodName}");
-            Console.WriteLine($"Temperament: {selected.Temperament}");
+            Console.WriteLine("=== Deine Startkonfiguration ===\n");
+            Console.WriteLine($"Name:      {_player.Name}");
+            Console.WriteLine($"Archetyp:  {arch?.Name ?? _player.ArchetypeId}");
+            Console.WriteLine($"Gott:      {arch?.GodName}");
+            Console.WriteLine($"Temperament: {arch?.Temperament}");
             Console.WriteLine("\nStartwerte:");
             foreach (var kv in _player.Stats)
             {
                 Console.WriteLine($"- {kv.Key}: {kv.Value}");
             }
 
-            Console.WriteLine("\nDas eigentliche Abenteuer (Persönlichkeitstest, Level, Finalkampf) ");
-            Console.WriteLine("wird an den folgenden Projekttagen implementiert.");
+            Console.WriteLine("\nAb den nächsten Projekttagen folgen:");
+            Console.WriteLine("- Level 1–5 mit je 4 Fragen");
+            Console.WriteLine("- Kämpfe gegen schwache Gegner");
+            Console.WriteLine("- Finale Prüfung gegen deinen Gott");
             Pause();
 
-            // Hier später:
+            // Hier später: InGame-Menü / Story / Kämpfe
             // ShowInGameMenu();
         }
 
