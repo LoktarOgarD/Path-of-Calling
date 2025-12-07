@@ -1,0 +1,216 @@
+Tag 1 = Grundlagen & Projektidee
+Festlegung des Konzepts:
+Psychologischer Persönlichkeitstest + Archetypen + Götterprüfung + Real-Life-Quests.
+
+Definition der vier Archetypen und ihrer Götter (Knight/St. Michael, Samurai/Hachiman, Viking/Thor, Bard/Hermes).
+
+Erstellung des Projektantrags in Markdown (Projektantrag.md):
+
+Zielsetzung,
+
+geplante Features,
+
+7-Tage-Plan,
+
+Dokumentationsstrategie.
+
+Design-Entscheidung:
+Ich habe mich bewusst für eine Konsolenanwendung in C# entschieden, um mich auf Logik, Struktur und Lesbarkeit zu konzentrieren – nicht auf GUI.
+
+Tag 2 = Menü-System & Game-Kern
+
+Erstellung einer einfachen Menü-Logik:
+
+Textausgabe,
+
+Auswahl per Zahl/Eingabe.
+
+Game-Klasse angelegt:
+
+Einstiegspunkt des Spiels,
+
+Hauptmenü (Neues Spiel, Fortsetzen (später), Beenden),
+
+Platz für spätere Module (Test, Level, Finalkampf).
+
+Reflexion:
+Aus früheren Projekten weiß ich, dass Menüs schnell unübersichtlich werden.
+Deshalb ist mein Ziel hier: modular, wiederverwendbar, wenig Redundanz.
+Kapitel 3 – Persönlichkeitstest & Archetypen-Bestimmung
+
+20 Fragen ausgearbeitet (russisch/deutsch) und in deine Struktur gebracht:
+
+Jede Frage hat:
+
+deutschen Text,
+verknüpfte Archetypen,
+
+ein kurzes Story-Szenario,
+
+XP-Logik (z. B. Routine vs. Risiko).
+
+Planung der Level-Logik:
+
+5 Levels,
+
+pro Level → 4 Fragen,
+
+am Ende jedes Levels → Kampf gegen einen schwachen Gegner,
+
+nach jedem Kampf → +1 Stat-Punkt.
+
+Am Ende der 20 Fragen:
+
+Berechnung des höchsten Archetypen-Scores,
+
+Zuweisung von Knight / Samurai / Viking / Bard.
+
+Wichtig:
+Nach der Archetypen-Bestimmung wird der Spieler später im Finale gegen seinen Gott antreten – aber nur, wenn er die Real-Life-Quests erfüllt hat.
+Tag 4 – Stats, Götter & Pantheon
+
+Verteilung der 15 Punkte pro Gott:
+
+Vitality, Might, Guard, Speed, Focus → ergeben einen klaren Archetyp-Spielstil.
+
+Spieler startet mit:
+
+10 Punkten in Strength, Discipline, Courage, Wisdom, Creativity (archetyp-spezifisch).
+
+Pro Level-Aufstieg:
+
++1 Punkt, frei verteilbar.
+
+Nach 5 Levels:
+
+Spieler hat insgesamt 15 Punkte.
+
+Real-Life-Bedingung:
+
+Ohne erledigte echte Aufgaben gibt es keine Ultimate → kein Zugang zur Götterprüfung.
+
+Design-Entscheidung:
+Die Götterwerte sollen klar zeigen:
+Knight ist defensiv, Viking ist brutal offensiv, Samurai ist präzise, Bard ist schnell und kontrolliert.
+Kapitel 5 – Hybrid-Kampfsystem (Inuyasha × South Park)
+
+Ziel:
+Kampf soll sich wie ein spannendes Duell anfühlen, aber technisch in einer Konsole machbar bleiben.
+
+Umsetzung:
+
+Einführung von Stances:
+
+Grounded, High, Low, Guarding → simulieren obere/untere Trefferzonen wie in Inuyasha.
+
+Einführung von TimingResult:
+
+Miss, Good, Perfect → inspiriert von South Park (Timing-Fenster mit ENTER).
+
+Klasse CombatMove:
+
+Name, MoveType (Light, Heavy, Skill, Guard, Focus, Ultimate), EnergyCost, BaseDamage, IgnoresStance.
+
+HitLogic:
+
+entscheidet, ob ein Angriff trifft:
+
+abhängig von Stance-Angreifer vs. Stance-Verteidiger,
+
+Ultimate ignoriert Haltung.
+
+Timing modifiziert Schaden (Miss = 0, Good = 1x, Perfect = 1.5x).
+
+Guard reduziert Schaden.
+
+CombatStep.ResolveStep(...):
+
+Nimmt:
+
+Spieler-Status + Move + Stance,
+
+Gott-Status + Move + Stance,
+
+berechnet beide Treffer und aktualisiert HP.
+
+MoveRepository:
+
+Definiert konkrete Moves pro Archetyp (z. B. „Righteous Strike“, „Iaijutsu“, „Wrath of Thor“, „Grand Performance“).
+
+Reflexion:
+Ich habe mich bewusst gegen echte „Koordinaten“ oder ein komplettes 2D-Kampfsystem entschieden. Stattdessen simuliere ich Inuyasha-Feeling über Haltungen (High/Low) und Timing.
+Das ist wesentlich leichter wartbar und erklärt sich gut in der Dokumentation.
+Kapitel 6 – Final Trial: Kampf gegen den Gott
+
+Implementierung von StartFinalGodTrial():
+
+Ablauf:
+
+Prüfen, ob:
+
+alle 5 Level geschafft sind,
+
+alle Real-Life-Quests (inkl. Deep Quest) als erledigt markiert sind.
+
+Wenn nein:
+
+Gott verweigert die Prüfung.
+
+Wenn ja:
+
+UnlockUltimateForPlayer() wird aufgerufen,
+
+passender Gott aus DeityRepository geladen,
+
+FighterState für Spieler und Gott aufgebaut,
+
+Gott setzt seine göttliche Fähigkeit ein → Spieler fällt auf 1 HP,
+
+der eigentliche Duell-Kampf beginnt.
+
+Kampf:
+
+Pro Runde:
+
+Spieler wählt:
+
+einen Move aus seiner Archetypen-Liste (inkl. Ultimate, falls noch nicht verwendet),
+
+eine Haltung (High/Low/Neutral/Guard).
+
+Gott wählt zufällig Move + Haltung.
+
+Schlagabtausch mit CombatStep.ResolveStep().
+
+Kampf endet:
+
+bei Hp <= 0 einer Seite.
+
+Story:
+
+Wenn Spieler verliert → „noch nicht bereit“.
+
+Wenn Spieler gewinnt → Gott erkennt ihn als würdig an; das ist der symbolische Abschluss des Projektes.
+Warum diese Architektur zu meinem Projekt passt
+
+Psychologie & Spielmechanik sind gekoppelt:
+
+Antworten im Test → Archetyp → Götterwerte → Kampfstil.
+
+Real-Life-Quests sind nicht nur Deko, sondern haben echte Konsequenzen:
+
+Ohne erfüllte Aufgaben keine Ultimate → kein Sieg gegen Gott.
+
+Hybrid-Kampfsystem zeigt:
+
+ich kenne Spiele wie Inuyasha & Hades & South Park,
+
+kann aber ein System entwerfen, das zu einer Konsolenanwendung passt.
+
+Die Struktur ist:
+
+modular (eigene Klassen pro Bereich),
+
+gut dokumentierbar (wichtig für Prüfung),
+
+erweiterbar (z. B. neue Archetypen, neue Götter, neue Fragen).
