@@ -1,116 +1,314 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PathOfCalling.Domain;
 
-namespace PathOfCalling.Domain
+namespace PathOfCalling
 {
     public static class PersonalityTestService
     {
-        /// <summary>
-        /// Führt den Persönlichkeitstest durch, sammelt Punkte für Archetypen
-        /// und weist dem Spieler am Ende den dominanten Archetyp zu.
-        /// </summary>
-        public static void RunPersonalityTestAndAssignArchetype(Player player)
+        private const string KNIGHT  = "Knight";
+        private const string SAMURAI = "Samurai";
+        private const string VIKING  = "Viking";
+        private const string BARD    = "Bard";
+
+        // 20 Fragen, in 5 Level à 4 Fragen aufgeteilt
+        private static readonly List<Question> AllQuestions = new List<Question>
         {
-            Console.Clear();
-            Console.WriteLine("=== Persönlichkeitstest – Die Götter stellen dir 20 Fragen ===\n");
-            Console.WriteLine("Antworte ehrlich. Deine Antworten bestimmen deinen Archetypen.\n");
-            Console.WriteLine("Antwort-Skala:");
-            Console.WriteLine("1) Trifft kaum zu / eher zurückhaltend");
-            Console.WriteLine("2) Trifft teilweise zu");
-            Console.WriteLine("3) Trifft stark zu / entspricht dir sehr");
-            Console.WriteLine("\nDrücke eine Taste, um zu beginnen...");
-            Console.ReadKey(true);
+            // --- Level 1: Neigung / Energie ---
+            new Question
+            {
+                Id = 1,
+                Level = 1,
+                GodName = "Thor",
+                Text = "Haben Sie oft das Bedürfnis nach neuen Eindrücken, nach Abwechslung und Aufregung?",
+                ArchetypeWeights = new Dictionary<string, double> { { VIKING, 1.0 }, { BARD, 0.5 } }
+            },
+            new Question
+            {
+                Id = 2,
+                Level = 1,
+                GodName = "Hachiman",
+                Text = "Denken Sie nach, bevor Sie etwas unternehmen?",
+                ArchetypeWeights = new Dictionary<string, double> { { SAMURAI, 1.0 }, { KNIGHT, 0.5 } }
+            },
+            new Question
+            {
+                Id = 3,
+                Level = 1,
+                GodName = "Thor",
+                Text = "Handeln und sprechen Sie immer schnell, ohne nachzudenken?",
+                ArchetypeWeights = new Dictionary<string, double> { { VIKING, 1.0 } }
+            },
+            new Question
+            {
+                Id = 4,
+                Level = 1,
+                GodName = "Hermes",
+                Text = "Können Sie leicht Leben in eine langweilige Gesellschaft bringen?",
+                ArchetypeWeights = new Dictionary<string, double> { { BARD, 1.0 }, { VIKING, 0.5 } }
+            },
 
-            var questions = PersonalityQuestionBank.GetAll();
+            // --- Level 2: Emotion ---
+            new Question
+            {
+                Id = 5,
+                Level = 2,
+                GodName = "Hermes",
+                Text = "Haben Sie oft Stimmungsschwankungen?",
+                ArchetypeWeights = new Dictionary<string, double> { { BARD, 0.8 }, { VIKING, 0.6 } }
+            },
+            new Question
+            {
+                Id = 6,
+                Level = 2,
+                GodName = "Hachiman",
+                Text = "Fühlen Sie sich oft ohne Grund unglücklich?",
+                ArchetypeWeights = new Dictionary<string, double> { { SAMURAI, -0.5 }, { KNIGHT, 0.5 } }
+            },
+            new Question
+            {
+                Id = 7,
+                Level = 2,
+                GodName = "Thor",
+                Text = "Waren Sie jemals wütend, wenn jemand Sie übertroffen hat?",
+                ArchetypeWeights = new Dictionary<string, double> { { VIKING, 1.0 }, { SAMURAI, 0.3 } }
+            },
+            new Question
+            {
+                Id = 8,
+                Level = 2,
+                GodName = "St. Michael",
+                Text = "Machen Sie sich oft Sorgen über Dinge, die Sie gesagt oder getan haben?",
+                ArchetypeWeights = new Dictionary<string, double> { { KNIGHT, 0.8 }, { SAMURAI, 0.4 } }
+            },
 
-            // Scores pro Archetyp
+            // --- Level 3: Pflicht ---
+            new Question
+            {
+                Id = 9,
+                Level = 3,
+                GodName = "St. Michael",
+                Text = "Wenn Sie etwas versprechen, halten Sie Ihr Versprechen immer ein?",
+                ArchetypeWeights = new Dictionary<string, double> { { KNIGHT, 1.0 }, { SAMURAI, 0.5 } }
+            },
+            new Question
+            {
+                Id = 10,
+                Level = 3,
+                GodName = "St. Michael",
+                Text = "Sind Sie immer bereit, einem Bedürftigen zu helfen?",
+                ArchetypeWeights = new Dictionary<string, double> { { KNIGHT, 1.0 } }
+            },
+            new Question
+            {
+                Id = 11,
+                Level = 3,
+                GodName = "Hermes",
+                Text = "Klatschen Sie manchmal oder verbreiten Sie gerne Gerüchte?",
+                ArchetypeWeights = new Dictionary<string, double> { { BARD, 0.8 } }
+            },
+            new Question
+            {
+                Id = 12,
+                Level = 3,
+                GodName = "Hachiman",
+                Text = "Bevorzugen Sie Bücher gegenüber Treffen mit Menschen?",
+                ArchetypeWeights = new Dictionary<string, double> { { SAMURAI, 1.0 } }
+            },
+
+            // --- Level 4: Ruhe / Rückzug ---
+            new Question
+            {
+                Id = 13,
+                Level = 4,
+                GodName = "Hachiman",
+                Text = "Bevorzugen Sie beim Reisen Landschaften gegenüber Gesprächen?",
+                ArchetypeWeights = new Dictionary<string, double> { { SAMURAI, 1.0 } }
+            },
+            new Question
+            {
+                Id = 14,
+                Level = 4,
+                GodName = "Hachiman",
+                Text = "Sind Sie in Gesellschaft eher still?",
+                ArchetypeWeights = new Dictionary<string, double> { { SAMURAI, 0.8 }, { KNIGHT, 0.4 } }
+            },
+            new Question
+            {
+                Id = 15,
+                Level = 4,
+                GodName = "Hachiman",
+                Text = "Gehen Sie langsam und bedächtig?",
+                ArchetypeWeights = new Dictionary<string, double> { { SAMURAI, 0.7 } }
+            },
+            new Question
+            {
+                Id = 16,
+                Level = 4,
+                GodName = "Hermes",
+                Text = "Wären Sie sehr unglücklich, wenn Sie lange ohne soziale Kontakte wären?",
+                ArchetypeWeights = new Dictionary<string, double> { { BARD, 1.0 } }
+            },
+
+            // --- Level 5: Ausdruck & Sozialität ---
+            new Question
+            {
+                Id = 17,
+                Level = 5,
+                GodName = "Hermes",
+                Text = "Sind Sie gerne in Gesellschaft?",
+                ArchetypeWeights = new Dictionary<string, double> { { BARD, 1.0 } }
+            },
+            new Question
+            {
+                Id = 18,
+                Level = 5,
+                GodName = "Hermes",
+                Text = "Können Sie Ihre Gefühle in Gesellschaft frei zeigen und ausgelassen feiern?",
+                ArchetypeWeights = new Dictionary<string, double> { { BARD, 1.0 }, { VIKING, 0.5 } }
+            },
+            new Question
+            {
+                Id = 19,
+                Level = 5,
+                GodName = "Thor",
+                Text = "Interessieren Sie sich für Wetten oder Herausforderungen?",
+                ArchetypeWeights = new Dictionary<string, double> { { VIKING, 1.0 }, { BARD, 0.4 } }
+            },
+            new Question
+            {
+                Id = 20,
+                Level = 5,
+                GodName = "Hermes",
+                Text = "Können Sie leicht Leben in eine langweilige Gesellschaft bringen?",
+                ArchetypeWeights = new Dictionary<string, double> { { BARD, 1.0 } }
+            }
+        };
+
+        public static void RunTrialsWithLevels(Player player)
+        {
             var scores = new Dictionary<string, double>
             {
-                { "Knight", 0.0 },
-                { "Samurai", 0.0 },
-                { "Viking", 0.0 },
-                { "Bard", 0.0 }
+                { KNIGHT, 0.0 },
+                { SAMURAI, 0.0 },
+                { VIKING,  0.0 },
+                { BARD,    0.0 }
             };
 
-            foreach (var q in questions)
+            Console.Clear();
+            Console.WriteLine("=== Die Prüfungen der Götter beginnen ===");
+            Console.WriteLine("Du wirst 5 Level mit jeweils 4 Fragen und einem inneren Gegner durchlaufen.\n");
+            Console.WriteLine("Drücke eine Taste, um zu beginnen...");
+            Console.ReadKey(true);
+
+            for (int level = 1; level <= 5; level++)
             {
-                AskQuestionAndScore(q, scores);
+                RunSingleLevel(player, level, scores);
             }
 
-            // Archetyp mit höchstem Score bestimmen
-            var best = scores
-                .OrderByDescending(kv => kv.Value)
-                .First();
-
-            player.ArchetypeId = best.Key;
+            // nach allen 5 Levels → Archetyp bestimmen
+            var winning = scores.OrderByDescending(kv => kv.Value).First();
+            player.ArchetypeId = winning.Key;
 
             Console.Clear();
-            var archetype = ArchetypeRepository.GetById(player.ArchetypeId);
-            Console.WriteLine("=== Auswertung des Persönlichkeitstests ===\n");
-            Console.WriteLine($"Dominanter Archetyp: {archetype?.Name ?? player.ArchetypeId}");
-            Console.WriteLine($"Temperament: {archetype?.Temperament}");
-            Console.WriteLine($"Patron / Gott: {archetype?.GodName}");
-            Console.WriteLine();
-
-            Console.WriteLine("Punkteverteilung:");
+            Console.WriteLine("=== Abschluss der Prüfungsfragen ===\n");
+            var arch = ArchetypeRepository.GetById(player.ArchetypeId);
+            Console.WriteLine($"Die Götter haben entschieden. Dein Archetyp ist: {arch?.Name ?? player.ArchetypeId}");
+            Console.WriteLine($"Temperament: {arch?.Temperament}");
+            Console.WriteLine($"Patron: {arch?.GodName}");
+            Console.WriteLine("\nPunkteverteilung:");
             foreach (var kv in scores)
             {
                 Console.WriteLine($"- {kv.Key}: {kv.Value:F1}");
             }
 
-            Console.WriteLine("\nDeine Basiswerte werden nun an deinen Archetyp angepasst.");
             PlayerArchetypeSetup.ApplyBaseStats(player);
+
+            Console.WriteLine("\nNun stellst du dich deinem persönlichen Schatten...");
+            Console.WriteLine("Drücke eine Taste, um den Schattenkampf zu beginnen.");
+            Console.ReadKey(true);
+
+            var shadow = ShadowEnemyRepository.GetShadowForArchetype(player.ArchetypeId);
+            bool shadowDefeated = RunSimpleShadowFight(player, shadow);
+
+            if (shadowDefeated)
+            {
+                Console.WriteLine("\nDu hast deinen Schatten besiegt und einen zusätzlichen Skill-Punkt erhalten!");
+                AllocateSkillPoint(player);
+                Console.WriteLine("Du bist jetzt bereit für die letzte Prüfung gegen deinen Gott.");
+            }
+            else
+            {
+                Console.WriteLine("\nDein Schatten war zu stark. In dieser Version geht die Story trotzdem weiter.");
+            }
 
             Console.WriteLine("\nDrücke eine Taste, um fortzufahren...");
             Console.ReadKey(true);
         }
 
-        private static void AskQuestionAndScore(
-            PersonalityQuestion question,
-            Dictionary<string, double> scores)
+        private static void RunSingleLevel(Player player, int level, Dictionary<string, double> scores)
         {
             Console.Clear();
+            Console.WriteLine($"=== Prüfungslevel {level} von 5 ===\n");
 
-            // Gott auswählen – erster zugehöriger Archetyp
-            string godName = "Die Götter";
-            if (question.RelatedArchetypes.Count > 0)
+            var questionsForLevel = AllQuestions
+                .Where(q => q.Level == level)
+                .OrderBy(q => q.Id)
+                .ToList();
+
+            foreach (var q in questionsForLevel)
             {
-                var archId = question.RelatedArchetypes[0];
-                var deity = DeityRepository.GetByArchetype(archId);
-                if (deity != null)
-                    godName = deity.Name;
+                ProcessQuestion(q, scores);
             }
 
-            Console.WriteLine($"Frage {question.Id}/20");
-            Console.WriteLine($"{godName} stellt dir eine Frage:\n");
+            Console.WriteLine($"\nDie Götter beobachten dich... Du hast Level {level} der Fragen abgeschlossen.");
+            Console.WriteLine("Nun stellt sich dir ein innerer Schatten entgegen.");
+            Console.WriteLine("Drücke eine Taste, um den Kampf zu beginnen...");
+            Console.ReadKey(true);
+
+            string? provisionalArch = GetCurrentLeadingArchetype(scores);
+            var minorShadow = ShadowEnemyRepository.GetMinorShadowForLevel(level, provisionalArch);
+            bool won = RunSimpleShadowFight(player, minorShadow);
+
+            if (won)
+            {
+                Console.WriteLine("\nDu hast den inneren Gegner besiegt und erhältst einen Skill-Punkt.");
+                AllocateSkillPoint(player);
+            }
+            else
+            {
+                Console.WriteLine("\nDu konntest diesen Schatten nicht überwinden. In dieser MVP-Version geht es trotzdem weiter.");
+            }
+
+            Console.WriteLine("\nDrücke eine Taste, um zum nächsten Prüfungslevel zu gehen...");
+            Console.ReadKey(true);
+        }
+
+        private static void ProcessQuestion(Question question, Dictionary<string, double> scores)
+        {
+            Console.Clear();
+            Console.WriteLine($"Frage {question.Id} (Level {question.Level}/5)");
+            Console.WriteLine($"{question.GodName} richtet das Wort an dich:\n");
             Console.WriteLine(question.Text);
             Console.WriteLine();
-            Console.WriteLine("Szenario:");
-            Console.WriteLine(question.Scenario);
-            Console.WriteLine();
 
-            int answer = AskAnswerScale();
+            int answer = AskAnswerOnScale();
+            double answerWeight = GetAnswerMultiplier(answer);
 
-            // XP-Logik übernehmen: 1.0 / 2.5 / 4.0
-            double weight = answer switch
+            foreach (var kvp in question.ArchetypeWeights)
             {
-                1 => 1.0,
-                2 => 2.5,
-                3 => 4.0,
-                _ => 0.0
-            };
+                string archetypeId = kvp.Key;
+                double factor = kvp.Value;
 
-            foreach (var archId in question.RelatedArchetypes)
-            {
-                if (!scores.ContainsKey(archId))
-                    scores[archId] = 0.0;
+                if (!scores.ContainsKey(archetypeId))
+                    scores[archetypeId] = 0.0;
 
-                scores[archId] += weight;
+                scores[archetypeId] += answerWeight * factor;
             }
         }
 
-        private static int AskAnswerScale()
+        private static int AskAnswerOnScale()
         {
             while (true)
             {
@@ -121,13 +319,118 @@ namespace PathOfCalling.Domain
                 Console.Write("> ");
                 string? input = Console.ReadLine();
 
-                if (int.TryParse(input, out int value)
-                    && value >= 1 && value <= 3)
-                {
+                if (int.TryParse(input, out int value) && value >= 1 && value <= 3)
                     return value;
-                }
 
                 Console.WriteLine("Ungültige Eingabe, bitte 1, 2 oder 3 eingeben.\n");
+            }
+        }
+
+        private static double GetAnswerMultiplier(int answer)
+        {
+            return answer switch
+            {
+                1 => 1.0,
+                2 => 2.5,
+                3 => 4.0,
+                _ => 0.0
+            };
+        }
+
+        private static string? GetCurrentLeadingArchetype(Dictionary<string, double> scores)
+        {
+            var best = scores.OrderByDescending(kv => kv.Value).FirstOrDefault();
+            if (best.Value <= 0.0)
+                return null;
+            return best.Key;
+        }
+
+        /// <summary>
+        /// Sehr einfacher Platzhalter-Kampf für Tag 4.
+        /// Später kannst du hier dein Würfel-/Hybrid-System einsetzen.
+        /// </summary>
+        private static bool RunSimpleShadowFight(Player player, ShadowEnemy enemy)
+        {
+            int playerHp = 10;           // einfacher Placeholder
+            int playerDamage = 3;
+            int enemyDamage = 2;         // du kannst hier enemy.AttackPower verwenden, wenn du willst
+
+            Console.Clear();
+            Console.WriteLine($"=== Kampf gegen {enemy.Name} ({enemy.Title}) ===");
+            Console.WriteLine(enemy.Description);
+            Console.WriteLine();
+
+            while (playerHp > 0 && enemy.Hp > 0)
+            {
+                Console.WriteLine($"{player.Name}: {playerHp} HP vs {enemy.Name}: {enemy.Hp} HP");
+                Console.WriteLine("1) Angreifen");
+                Console.WriteLine("2) Verteidigen");
+                Console.Write("> ");
+                string? input = Console.ReadLine();
+
+                if (input == "1")
+                {
+                    Console.WriteLine($"Du greifst {enemy.Name} an!");
+                    enemy.Hp -= playerDamage;
+                    if (enemy.Hp < 0) enemy.Hp = 0;
+                }
+                else
+                {
+                    Console.WriteLine("Du gehst in die Defensive und sammelst Kraft.");
+                    playerDamage += 1;
+                }
+
+                if (enemy.Hp <= 0)
+                    break;
+
+                Console.WriteLine($"{enemy.Name} schlägt zurück!");
+                playerHp -= enemyDamage;
+                if (playerHp < 0) playerHp = 0;
+                Console.WriteLine();
+            }
+
+            if (playerHp > 0)
+            {
+                Console.WriteLine($"\nDu hast {enemy.Name} besiegt.");
+                return true;
+            }
+
+            Console.WriteLine($"\nDu wurdest von {enemy.Name} überwältigt.");
+            return false;
+        }
+
+        private static void AllocateSkillPoint(Player player)
+        {
+            Console.Clear();
+            Console.WriteLine("Du erhältst 1 Skill-Punkt.");
+            Console.WriteLine("Wähle eine Eigenschaft, die du stärken möchtest:\n");
+
+            var stats = new List<StatType>
+            {
+                StatType.Strength,
+                StatType.Discipline,
+                StatType.Courage,
+                StatType.Wisdom,
+                StatType.Creativity
+            };
+
+            for (int i = 0; i < stats.Count; i++)
+            {
+                var s = stats[i];
+                Console.WriteLine($"{i + 1}) {s} (aktuell: {player.Stats[s]})");
+            }
+
+            Console.Write("\nAuswahl (Zahl): ");
+            string? input = Console.ReadLine();
+            if (int.TryParse(input, out int index) && index >= 1 && index <= stats.Count)
+            {
+                var chosen = stats[index - 1];
+                player.Stats[chosen] += 1;
+                Console.WriteLine($"\n{chosen} wurde um 1 Punkt erhöht. Neuer Wert: {player.Stats[chosen]}");
+            }
+            else
+            {
+                Console.WriteLine("\nUngültige Eingabe. Skill-Punkt wurde nicht verteilt.");
             }
         }
     }
