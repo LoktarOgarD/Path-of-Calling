@@ -6,13 +6,8 @@ namespace PathOfCalling.Domain
     {
         public string Name { get; set; } = "Wanderer";
 
-        // Назначается после Personality Test
         public string ArchetypeId { get; set; } = "";
 
-        // Уровни 1–5 (испытания)
-        public int Level { get; set; } = 1;
-
-        // Основные характеристики
         public Dictionary<StatType, int> Stats { get; set; } =
             new Dictionary<StatType, int>
             {
@@ -22,9 +17,10 @@ namespace PathOfCalling.Domain
                 { StatType.Wisdom, 0 },
                 { StatType.Creativity, 0 }
             };
-
-        // === Финальная механика ===
+        
         public bool UltimateUnlocked { get; set; } = false;
         public string UltimateName { get; set; } = "";
     }
 }
+//Der Spieler startet bewusst ohne Archetyp und ohne Werte.
+//Seine Entscheidungen formen ihn – nicht eine vorgegebene Klasse.
