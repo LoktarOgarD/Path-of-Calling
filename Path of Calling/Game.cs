@@ -5,95 +5,116 @@ namespace PathOfCalling
 {
     public class Game
     {
-        private Player _player;
-        private bool _running = true;
+        private Player? _currentPlayer;
 
         public void Run()
         {
-            while (_running)
-            {
-                ShowMainMenu();
-            }
-        }
+            bool running = true;
 
-        private void ShowMainMenu()
-        {
+            while (running)
+            {
+                Console.Clear();
+                Console.WriteLine("=== PATH OF CALLING ===");
+                Console.WriteLine();
+                Console.WriteLine("1) Neues Spiel");
+                Console.WriteLine("2) Fortsetzen (Letzter Spielstand)");
+                Console.WriteLine("3) Einstellungen");
+                Console.WriteLine("4) Beenden");
+                Console.WriteLine();
+                Console.Write("Auswahl: ");
+
+                var input = Console.ReadLine();
+
+                switch (input)
+                {
+                    case "1":
+                        StartNewGame();
+                        break;
+                    case "2":
+                        ContinueGame();
+                        break;
+                    case "3":
+                        ShowSettings();
+                        break;
+                    case "4":
+                        running = false;
+                        break;
+                    default:
+                        Console.WriteLine("Ungültige Eingabe. Drücke eine Taste...");
+                        Console.ReadKey(true);
+                        break;
+                }
+            }
+
             Console.Clear();
-            Console.WriteLine("=== Path of Calling ===\n");
-            Console.WriteLine("1) Neues Spiel");
-            Console.WriteLine("2) Spiel laden (später)");
-            Console.WriteLine("3) Beenden");
-            Console.Write("\nAuswahl: ");
-
-            string? input = Console.ReadLine();
-
-            switch (input)
-            {
-                case "1":
-                    StartNewGame();
-                    break;
-                case "2":
-                    Console.WriteLine("Ladefunktion wird in einem späteren Projekttag implementiert.");
-                    Pause();
-                    break;
-                case "3":
-                    _running = false;
-                    Console.WriteLine("Spiel wird beendet. Auf Wiedersehen.");
-                    Pause();
-                    break;
-                default:
-                    Console.WriteLine("Ungültige Eingabe, bitte erneut versuchen.");
-                    Pause();
-                    break;
-            }
+            Console.WriteLine("Danke fürs Spielen. Bis bald auf deinem Path of Calling.");
+            Console.WriteLine("Drücke eine Taste zum Beenden...");
+            Console.ReadKey(true);
         }
 
         private void StartNewGame()
         {
             Console.Clear();
             Console.WriteLine("=== Neues Spiel ===\n");
-
             Console.Write("Gib den Namen deines Charakters ein: ");
             string? name = Console.ReadLine();
+
             if (string.IsNullOrWhiteSpace(name))
                 name = "Wanderer";
 
-            _player = new Player
+            _currentPlayer = new Player
             {
                 Name = name,
-                Level = 1
+                Level = 1,
+                ArchetypeId = ""
             };
 
-            // Tag 3: Persönlichkeitstest führt zur Archetyp-Bestimmung
-            PersonalityTestService.RunPersonalityTestAndAssignArchetype(_player);
+            Console.WriteLine($"\nWillkommen, {name}. Die Götter beobachten dich...");
+            Console.WriteLine("Drücke eine Taste, um die Prüfungen zu beginnen.");
+            Console.ReadKey(true);
 
-            // Kurze Zusammenfassung
-            var arch = ArchetypeRepository.GetById(_player.ArchetypeId);
-            Console.Clear();
-            Console.WriteLine("=== Deine Startkonfiguration ===\n");
-            Console.WriteLine($"Name:      {_player.Name}");
-            Console.WriteLine($"Archetyp:  {arch?.Name ?? _player.ArchetypeId}");
-            Console.WriteLine($"Gott:      {arch?.GodName}");
-            Console.WriteLine($"Temperament: {arch?.Temperament}");
-            Console.WriteLine("\nStartwerte:");
-            foreach (var kv in _player.Stats)
-            {
-                Console.WriteLine($"- {kv.Key}: {kv.Value}");
-            }
+            // 👉 Hier läuft dein 5-Level-Persönlichkeitstest + Schattenkämpfe
+            PersonalityTestService.RunTrialsWithLevels(_currentPlayer);
 
-            Console.WriteLine("\nAb den nächsten Projekttagen folgen:");
-            Console.WriteLine("- Level 1–5 mit je 4 Fragen");
-            Console.WriteLine("- Kämpfe gegen schwache Gegner");
-            Console.WriteLine("- Finale Prüfung gegen deinen Gott");
-            Pause();
+            // Nach dem Test direkt speichern
+            SaveService.SavePlayer(_currentPlayer);
 
-            // Hier später: InGame-Menü / Story / Kämpfe
-            // ShowInGameMenu();
+            Console.WriteLine("\nDein Fortschritt wurde gespeichert.");
+            Console.WriteLine("Drücke eine Taste, um ins Hauptmenü zurückzukehren...");
+            Console.ReadKey(true);
         }
 
-        private void Pause()
+        private void ContinueGame()
         {
-            Console.WriteLine("\nDrücke eine Taste, um fortzufahren...");
+            Console.Clear();
+            Console.WriteLine("=== Spiel fortsetzen ===\n");
+
+            var loaded = SaveService.LoadPlayer();
+            if (loaded == null)
+            {
+                Console.WriteLine("Kein gültiger Spielstand gefunden.");
+                Console.WriteLine("Starte zuerst ein neues Spiel.");
+                Console.WriteLine("\nDrücke eine Taste, um zurückzukehren...");
+                Console.ReadKey(true);
+                return;
+            }
+
+            _currentPlayer = loaded;
+
+            Console.WriteLine($"Willkommen zurück, {_currentPlayer.Name}.");
+            Console.WriteLine($"Archetyp: {_currentPlayer.ArchetypeId}, Level: {_currentPlayer.Level}");
+            Console.WriteLine("\n(An dieser Stelle kannst du später entscheiden: weiterer Test, Kampagne, Final God Trial usw.)");
+            Console.WriteLine("Drücke eine Taste, um ins Hauptmenü zurückzukehren...");
+            Console.ReadKey(true);
+        }
+
+        private void ShowSettings()
+        {
+            Console.Clear();
+            Console.WriteLine("=== Einstellungen ===\n");
+            Console.WriteLine("(Für das MVP nur Platzhalter.)");
+            Console.WriteLine("- Später: Textgeschwindigkeit, Farben, Sprache etc.");
+            Console.WriteLine("\nDrücke eine Taste, um zurückzukehren...");
             Console.ReadKey(true);
         }
     }
