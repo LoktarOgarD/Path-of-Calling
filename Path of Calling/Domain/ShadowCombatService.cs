@@ -3,13 +3,16 @@ using PathOfCalling.Domain;
 
 namespace PathOfCalling
 {
+    /// <summary>
+    /// Enthält die Kämpfe gegen die Schatten-Gegner.
+    /// Kleine Schatten: nach jedem Level.
+    /// Großer Schatten: nach dem Persönlichkeitstest (Level 5).
+    /// </summary>
     public static class ShadowCombatService
     {
-        private const int DicePoolPerRound = 6;
-
         /// <summary>
-        /// Kampf gegen kleinen Schatten nach jedem Level (1–4).
-        /// Spieler kann einmal pro Kampf eine reale Aufgabe melden und 2 Bonuspunkte verteilen.
+        /// Kampf gegen kleinen Schatten nach einem Fragen-Level.
+        /// Nur Würfel + Verteilung, keine Ultimates.
         /// </summary>
         public static bool RunMinorShadowFight(Player player, ShadowEnemy enemy)
         {
@@ -17,8 +20,9 @@ namespace PathOfCalling
         }
 
         /// <summary>
-        /// Kampf gegen großen Archetyp-Schatten nach Level 5.
-        /// Wenn Spieler gewinnt und reale Aufgabe bestätigt → UltimateUnlocked = true.
+        /// Kampf gegen den großen Archetyp-Schatten.
+        /// Wenn der Spieler gewinnt und seine reale Aufgabe bestätigt,
+        /// wird die Ultimate-Fähigkeit freigeschaltet.
         /// </summary>
         public static bool RunFinalShadowFight(Player player, ShadowEnemy enemy)
         {
@@ -26,18 +30,24 @@ namespace PathOfCalling
 
             if (result)
             {
-                Console.WriteLine("\nDer Schatten fragt dich:");
+                Console.WriteLine();
+                Console.WriteLine("Der Schatten schaut dich an und fragt:");
                 Console.WriteLine("Hast du deine reale Prüfungsaufgabe für heute wirklich erfüllt? (j/n)");
                 Console.Write("> ");
-                var key = Console.ReadLine();
-                if (!string.IsNullOrWhiteSpace(key) && key.Trim().ToLower().StartsWith("j"))
+                string? answer = Console.ReadLine();
+
+                if (!string.IsNullOrWhiteSpace(answer) &&
+                    answer.Trim().ToLower().StartsWith("j"))
                 {
                     player.UltimateUnlocked = true;
-                    Console.WriteLine("\nDein Wille wurde anerkannt. Deine Ultimate-Fähigkeit wird freigeschaltet.");
+                    Console.WriteLine();
+                    Console.WriteLine("Die Götter spüren deine Tat in der echten Welt.");
+                    Console.WriteLine("Deine Ultimate-Fähigkeit wird freigeschaltet.");
                 }
                 else
                 {
-                    Console.WriteLine("\nDu hast den Schatten besiegt, aber die Götter spüren, dass die Aufgabe unvollständig ist.");
+                    Console.WriteLine();
+                    Console.WriteLine("Du hast gewonnen, aber die Götter zweifeln noch.");
                     Console.WriteLine("Die Ultimate bleibt vorerst verschlossen.");
                 }
             }
@@ -45,161 +55,218 @@ namespace PathOfCalling
             return result;
         }
 
+        /// <summary>
+        /// Gemeinsame Logik für kleinen und großen Schatten-Kampf.
+        /// Pro Runde: 1× W6, Spieler verteilt die Punkte auf Angriff / Verteidigung.
+        /// Einmal pro Kampf: echte Aufgabe melden und +2 permanente Punkte bekommen.
+        /// </summary>
         private static bool RunShadowFightInternal(Player player, ShadowEnemy enemy, bool isFinalShadow)
         {
-            var random = new Random();
+            Random random = new Random();
 
-            int playerHp     = 10 + player.Stats[StatType.Strength];      // einfache Kopplung an Stats
-            int baseAttack   = 3  + player.Stats[StatType.Strength] / 2;
-            int baseDefense  = 3  + player.Stats[StatType.Discipline] / 2;
+            // einfache Kopplung an Werte des Spielers
+            int playerHp = 10 + player.Stats[StatType.Strength];
+            int baseAttack = 2 + player.Stats[StatType.Strength] / 2;
+            int baseDefense = 2 + player.Stats[StatType.Discipline] / 2;
 
-            int enemyHp      = enemy.Hp;
-            int enemyAttack  = enemy.AttackPower;
+            int enemyHp = enemy.Hp;
+            int enemyAttack = enemy.AttackPower;
             int enemyDefense = enemy.DefensePower;
 
-            bool bonusUsed       = false;
-            int bonusAttackPerm  = 0;
-            int bonusDefensePerm = 0;
+            bool bonusUsed = false;
+            int bonusAttack = 0;
+            int bonusDefense = 0;
 
             Console.Clear();
-            Console.WriteLine(isFinalShadow
-                ? $"=== Letzter Schattenkampf: {enemy.Name} ({enemy.Title}) ==="
-                : $"=== Kampf gegen inneren Schatten: {enemy.Name} ({enemy.Title}) ===");
+            if (isFinalShadow)
+            {
+                Console.WriteLine("=== Letzter Schattenkampf ===");
+            }
+            else
+            {
+                Console.WriteLine("=== Kampf gegen inneren Schatten ===");
+            }
+
+            Console.WriteLine($"{enemy.Name} – {enemy.Title}");
             Console.WriteLine(enemy.Description);
             Console.WriteLine();
+            Console.WriteLine("Pro Runde wird ein W6 gewürfelt.");
+            Console.WriteLine("Du verteilst die Augen auf Angriff und Verteidigung.");
+            Console.WriteLine("Einmal pro Kampf kannst du eine reale Aufgabe melden und +2 Punkte bekommen.");
+            Console.WriteLine();
+            Console.WriteLine("Drücke eine Taste, um zu beginnen...");
+            Console.ReadKey(true);
+            Console.Clear();
+
+            int round = 1;
 
             while (playerHp > 0 && enemyHp > 0)
             {
-                Console.WriteLine($"Spieler HP: {playerHp} | Schatten HP: {enemyHp}");
-                Console.WriteLine($"Basis: Angriff {baseAttack}+{bonusAttackPerm}, Verteidigung {baseDefense}+{bonusDefensePerm}");
+                Console.WriteLine($"=== Runde {round} ===");
+                Console.WriteLine($"Deine HP:   {playerHp}");
+                Console.WriteLine($"Schatten HP: {enemyHp}");
                 Console.WriteLine();
-                Console.WriteLine("Wähle deine Haltung für diese Runde:");
-                Console.WriteLine("1) Aggressiv    (4 Würfel Angriff, 2 Verteidigung)");
-                Console.WriteLine("2) Ausgeglichen (3 Würfel Angriff, 3 Verteidigung)");
-                Console.WriteLine("3) Defensiv     (2 Würfel Angriff, 4 Verteidigung)");
+                Console.WriteLine($"Basiswerte (ohne Würfel):");
+                Console.WriteLine($"  Angriff:    {baseAttack}  (+{bonusAttack} Bonus)");
+                Console.WriteLine($"  Verteidigung: {baseDefense}  (+{bonusDefense} Bonus)");
+                Console.WriteLine();
+
+                // Möglichkeit: reale Aufgabe einlösen (nur einmal pro Kampf)
                 if (!bonusUsed)
-                    Console.WriteLine("4) Ich habe meine reale Aufgabe erledigt (Bonus +2 permanent verteilen)");
-                Console.Write("> ");
-                string? input = Console.ReadLine();
-
-                int playerAttackDice = 0;
-                int playerDefenseDice = 0;
-
-                if (input == "1")
                 {
-                    playerAttackDice = 4;
-                    playerDefenseDice = 2;
-                }
-                else if (input == "2")
-                {
-                    playerAttackDice = 3;
-                    playerDefenseDice = 3;
-                }
-                else if (input == "3")
-                {
-                    playerAttackDice = 2;
-                    playerDefenseDice = 4;
-                }
-                else if (input == "4" && !bonusUsed)
-                {
-                    Console.WriteLine("\nWelche reale Aufgabe hast du erledigt?");
+                    Console.WriteLine("Möchtest du deine reale Aufgabe einlösen und +2 permanente Punkte erhalten?");
+                    Console.WriteLine("1) Ja, Aufgabe erledigt");
+                    Console.WriteLine("2) Nein, weiterkämpfen");
                     Console.Write("> ");
-                    string? quest = Console.ReadLine();
-                    Console.WriteLine("\nDu erhältst 2 Bonuspunkte. Wie möchtest du sie verteilen?");
-                    Console.WriteLine("1) +2 Angriff");
-                    Console.WriteLine("2) +2 Verteidigung");
-                    Console.WriteLine("3) +1 Angriff, +1 Verteidigung");
-                    Console.Write("> ");
-                    string? bonusChoice = Console.ReadLine();
+                    string? taskInput = Console.ReadLine();
 
-                    switch (bonusChoice)
+                    if (taskInput == "1")
                     {
-                        case "1":
-                            bonusAttackPerm += 2;
-                            break;
-                        case "2":
-                            bonusDefensePerm += 2;
-                            break;
-                        default:
-                            bonusAttackPerm += 1;
-                            bonusDefensePerm += 1;
-                            break;
+                        HandleRealWorldTask(ref bonusAttack, ref bonusDefense, ref bonusUsed);
+                        Console.WriteLine("\nDrücke eine Taste, um die Runde zu beginnen...");
+                        Console.ReadKey(true);
+                        Console.Clear();
+                        continue; // Runde neu starten, jetzt mit Bonus
                     }
-
-                    bonusUsed = true;
-                    Console.WriteLine("\nDie Götter haben deinen Einsatz in der echten Welt gespürt.");
-                    Console.WriteLine("Deine Werte steigen für den Rest des Kampfes.\n");
-                    continue; // Runde neu mit neuer Haltung wählen
                 }
-                else
+
+                // 1× W6 würfeln
+                int roll = random.Next(1, 7);
+                Console.WriteLine($"Du würfelst: {roll}");
+                Console.WriteLine();
+
+                int attackPoints = 0;
+                int defensePoints = 0;
+
+                // Spieler entscheidet, wie viele Punkte in Angriff gehen
+                Console.WriteLine("Wie viele der Punkte möchtest du in ANGRIFF stecken?");
+                Console.WriteLine($"(0 bis {roll}, der Rest geht automatisch in VERTEIDIGUNG)");
+                Console.Write("> ");
+                string? attackInput = Console.ReadLine();
+
+                if (!int.TryParse(attackInput, out attackPoints))
                 {
-                    Console.WriteLine("\nUnklare Eingabe, du kämpfst ausgeglichen.");
-                    playerAttackDice = 3;
-                    playerDefenseDice = 3;
+                    attackPoints = roll; // Standard: alles in Angriff
                 }
 
-                // Gegner verteilt symmetrisch (einfacher MVP)
-                int enemyAttackDice = 3;
-                int enemyDefenseDice = 3;
+                if (attackPoints < 0) attackPoints = 0;
+                if (attackPoints > roll) attackPoints = roll;
+
+                defensePoints = roll - attackPoints;
+
+                Console.WriteLine();
+                Console.WriteLine($"Verteilung dieser Runde:");
+                Console.WriteLine($"  Angriffspunkte:    {attackPoints}");
+                Console.WriteLine($"  Verteidigungspunkte: {defensePoints}");
+                Console.WriteLine();
 
                 // --- Spieler greift an ---
-                int playerAttackRoll = baseAttack + bonusAttackPerm + RollDice(random, playerAttackDice);
-                int enemyDefenseRoll = enemyDefense + RollDice(random, enemyDefenseDice);
+                int totalPlayerAttack = baseAttack + bonusAttack + attackPoints;
+                int totalEnemyDefense = enemyDefense;
 
-                int damageToEnemy = Math.Max(0, playerAttackRoll - enemyDefenseRoll);
+                int damageToEnemy = totalPlayerAttack - totalEnemyDefense;
+                if (damageToEnemy < 0) damageToEnemy = 0;
+
                 if (damageToEnemy > 0)
                 {
                     enemyHp -= damageToEnemy;
-                    Console.WriteLine($"\nDu triffst den Schatten für {damageToEnemy} Schaden!");
                     if (enemyHp < 0) enemyHp = 0;
+                    Console.WriteLine($"Du triffst den Schatten für {damageToEnemy} Schaden.");
                 }
                 else
                 {
-                    Console.WriteLine("\nDein Angriff prallt an der Dunkelheit ab.");
+                    Console.WriteLine("Dein Angriff prallt an der Dunkelheit ab.");
                 }
 
                 if (enemyHp <= 0)
+                {
+                    Console.WriteLine("\nDer Schatten beginnt zu zerfallen...");
                     break;
+                }
+
+                Console.WriteLine();
 
                 // --- Schatten greift an ---
-                int enemyAttackRoll = enemyAttack + RollDice(random, enemyAttackDice);
-                int playerDefenseRoll = baseDefense + bonusDefensePerm + RollDice(random, playerDefenseDice);
+                int totalEnemyAttack = enemyAttack;
+                int totalPlayerDefense = baseDefense + bonusDefense + defensePoints;
 
-                int damageToPlayer = Math.Max(0, enemyAttackRoll - playerDefenseRoll);
+                int damageToPlayer = totalEnemyAttack - totalPlayerDefense;
+                if (damageToPlayer < 0) damageToPlayer = 0;
+
                 if (damageToPlayer > 0)
                 {
                     playerHp -= damageToPlayer;
-                    Console.WriteLine($"Der Schatten trifft dich für {damageToPlayer} Schaden!");
                     if (playerHp < 0) playerHp = 0;
+                    Console.WriteLine($"Der Schatten trifft dich für {damageToPlayer} Schaden.");
                 }
                 else
                 {
                     Console.WriteLine("Du parierst den Angriff des Schattens.");
                 }
 
-                Console.WriteLine("\nDrücke eine Taste für die nächste Runde...");
+                Console.WriteLine();
+                Console.WriteLine("Drücke eine Taste für die nächste Runde...");
                 Console.ReadKey(true);
                 Console.Clear();
+
+                round++;
             }
 
             if (playerHp > 0)
             {
-                Console.WriteLine($"\nDu hast {enemy.Name} besiegt.");
+                Console.WriteLine("Du hast deinen Schatten besiegt.");
                 return true;
             }
 
-            Console.WriteLine($"\nDu wurdest von {enemy.Name} überwältigt.");
+            Console.WriteLine("Du wurdest von deinem Schatten überwältigt.");
             return false;
         }
 
-        private static int RollDice(Random random, int count)
+        /// <summary>
+        /// Einmal pro Kampf kann der Spieler eine reale Aufgabe nennen
+        /// und +2 permanente Punkte auf Angriff / Verteidigung verteilen.
+        /// </summary>
+        private static void HandleRealWorldTask(
+            ref int bonusAttack,
+            ref int bonusDefense,
+            ref bool bonusUsed)
         {
-            int sum = 0;
-            for (int i = 0; i < count; i++)
+            Console.Clear();
+            Console.WriteLine("=== Reale Aufgabe ===");
+            Console.WriteLine("Welche reale Aufgabe hast du heute erfüllt?");
+            Console.WriteLine("(z.B. Lernen, Training, schwieriges Gespräch, Haushalt, usw.)");
+            Console.Write("> ");
+            string? quest = Console.ReadLine();
+
+            Console.WriteLine();
+            Console.WriteLine("Die Götter spüren deine Tat in der echten Welt.");
+            Console.WriteLine("Du erhältst 2 permanente Bonuspunkte für diesen Kampf.");
+            Console.WriteLine();
+            Console.WriteLine("Wie möchtest du sie verteilen?");
+            Console.WriteLine("1) +2 Angriff");
+            Console.WriteLine("2) +2 Verteidigung");
+            Console.WriteLine("3) +1 Angriff, +1 Verteidigung");
+            Console.Write("> ");
+            string? choice = Console.ReadLine();
+
+            if (choice == "1")
             {
-                sum += random.Next(1, 7); // W6
+                bonusAttack += 2;
+                Console.WriteLine("\nDu fühlst, wie deine Schlagkraft wächst. (+2 Angriff)");
             }
-            return sum;
+            else if (choice == "2")
+            {
+                bonusDefense += 2;
+                Console.WriteLine("\nDu stehst fester als zuvor. (+2 Verteidigung)");
+            }
+            else
+            {
+                bonusAttack += 1;
+                bonusDefense += 1;
+                Console.WriteLine("\nDu findest Balance zwischen Angriff und Schutz. (+1/+1)");
+            }
+
+            bonusUsed = true;
         }
     }
 }
