@@ -13,7 +13,7 @@ namespace PathOfCalling
         private const string BARD    = "Bard";
 
         // 20 Fragen, in 5 Level à 4 Fragen aufgeteilt
-        private static readonly List<Question> AllQuestions = new List<Question>
+        private static readonly List<Question> AllQuestions = new()
         {
             // --- Level 1: Neigung / Energie ---
             new Question
@@ -199,6 +199,7 @@ namespace PathOfCalling
             Console.Clear();
             Console.WriteLine("=== Die Prüfungen der Götter beginnen ===");
             Console.WriteLine("Du wirst 5 Level mit jeweils 4 Fragen und einem inneren Gegner durchlaufen.\n");
+            Console.WriteLine("Antwort-Skala: 1 = kaum, 2 = teilweise, 3 = stark.");
             Console.WriteLine("Drücke eine Taste, um zu beginnen...");
             Console.ReadKey(true);
 
@@ -226,21 +227,23 @@ namespace PathOfCalling
             PlayerArchetypeSetup.ApplyBaseStats(player);
 
             Console.WriteLine("\nNun stellst du dich deinem persönlichen Schatten...");
-            Console.WriteLine("Drücke eine Taste, um den Schattenkampf zu beginnen.");
+            Console.WriteLine("Drücke eine Taste, um den großen Schattenkampf zu beginnen.");
             Console.ReadKey(true);
 
             var shadow = ShadowEnemyRepository.GetShadowForArchetype(player.ArchetypeId);
-            bool shadowDefeated = RunSimpleShadowFight(player, shadow);
+            bool shadowDefeated = ShadowCombatService.RunFinalShadowFight(player, shadow);
 
-            if (shadowDefeated)
+            if (shadowDefeated && player.UltimateUnlocked)
             {
-                Console.WriteLine("\nDu hast deinen Schatten besiegt und einen zusätzlichen Skill-Punkt erhalten!");
-                AllocateSkillPoint(player);
-                Console.WriteLine("Du bist jetzt bereit für die letzte Prüfung gegen deinen Gott.");
+                Console.WriteLine("\nDu bist bereit für die letzte Prüfung gegen deinen Gott. (Geplant für spätere Version)");
+            }
+            else if (shadowDefeated)
+            {
+                Console.WriteLine("\nDu hast den Schatten besiegt, aber deine Ultimate ist noch versiegelt.");
             }
             else
             {
-                Console.WriteLine("\nDein Schatten war zu stark. In dieser Version geht die Story trotzdem weiter.");
+                Console.WriteLine("\nDer Schatten bleibt vorerst bestehen. In dieser MVP-Version endet der Weg hier.");
             }
 
             Console.WriteLine("\nDrücke eine Taste, um fortzufahren...");
@@ -267,9 +270,9 @@ namespace PathOfCalling
             Console.WriteLine("Drücke eine Taste, um den Kampf zu beginnen...");
             Console.ReadKey(true);
 
-            string? provisionalArch = GetCurrentLeadingArchetype(scores);
-            var minorShadow = ShadowEnemyRepository.GetMinorShadowForLevel(level, provisionalArch);
-            bool won = RunSimpleShadowFight(player, minorShadow);
+            string? leadingArch = GetLeadingArchetype(scores);
+            var minorShadow = ShadowEnemyRepository.GetMinorShadowForLevel(level, leadingArch);
+            bool won = ShadowCombatService.RunMinorShadowFight(player, minorShadow);
 
             if (won)
             {
@@ -337,66 +340,10 @@ namespace PathOfCalling
             };
         }
 
-        private static string? GetCurrentLeadingArchetype(Dictionary<string, double> scores)
+        private static string? GetLeadingArchetype(Dictionary<string, double> scores)
         {
             var best = scores.OrderByDescending(kv => kv.Value).FirstOrDefault();
-            if (best.Value <= 0.0)
-                return null;
-            return best.Key;
-        }
-
-        /// <summary>
-        /// Sehr einfacher Platzhalter-Kampf für Tag 4.
-        /// Später kannst du hier dein Würfel-/Hybrid-System einsetzen.
-        /// </summary>
-        private static bool RunSimpleShadowFight(Player player, ShadowEnemy enemy)
-        {
-            int playerHp = 10;           // einfacher Placeholder
-            int playerDamage = 3;
-            int enemyDamage = 2;         // du kannst hier enemy.AttackPower verwenden, wenn du willst
-
-            Console.Clear();
-            Console.WriteLine($"=== Kampf gegen {enemy.Name} ({enemy.Title}) ===");
-            Console.WriteLine(enemy.Description);
-            Console.WriteLine();
-
-            while (playerHp > 0 && enemy.Hp > 0)
-            {
-                Console.WriteLine($"{player.Name}: {playerHp} HP vs {enemy.Name}: {enemy.Hp} HP");
-                Console.WriteLine("1) Angreifen");
-                Console.WriteLine("2) Verteidigen");
-                Console.Write("> ");
-                string? input = Console.ReadLine();
-
-                if (input == "1")
-                {
-                    Console.WriteLine($"Du greifst {enemy.Name} an!");
-                    enemy.Hp -= playerDamage;
-                    if (enemy.Hp < 0) enemy.Hp = 0;
-                }
-                else
-                {
-                    Console.WriteLine("Du gehst in die Defensive und sammelst Kraft.");
-                    playerDamage += 1;
-                }
-
-                if (enemy.Hp <= 0)
-                    break;
-
-                Console.WriteLine($"{enemy.Name} schlägt zurück!");
-                playerHp -= enemyDamage;
-                if (playerHp < 0) playerHp = 0;
-                Console.WriteLine();
-            }
-
-            if (playerHp > 0)
-            {
-                Console.WriteLine($"\nDu hast {enemy.Name} besiegt.");
-                return true;
-            }
-
-            Console.WriteLine($"\nDu wurdest von {enemy.Name} überwältigt.");
-            return false;
+            return best.Value > 0 ? best.Key : null;
         }
 
         private static void AllocateSkillPoint(Player player)
