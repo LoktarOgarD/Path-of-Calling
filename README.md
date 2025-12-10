@@ -1,201 +1,369 @@
-# Path of Calling
+# Path of Calling – Konsolen-RPG mit psychologischem Test
+
+**Path of Calling** ist eine C#-Konsolenanwendung, die einen psychologischen Persönlichkeitstest
+mit Archetypen, Göttern und realen Aufgaben aus dem echten Leben verbindet.
+
+Der Spieler beantwortet 20 Fragen, durchläuft 5 Prüfungslevel mit inneren Schattengegnern
+und erhält am Ende einen Archetyp (Knight, Samurai, Viking, Bard) mit passendem Kampfstil.
+Erst wenn der Spieler seine realen Aufgaben erfüllt, kann er seine Ultimate-Fähigkeit freischalten.
 
 ## Überblick
 Ein interaktives Selbstentwicklungs-Spiel, bei dem reale Aufgaben die Stärke deines Charakters bestimmen.
-<img width="1536" height="1024" alt="Path Of Calling DIagrams" src="https://github.com/user-attachments/assets/c1c9e5ff-abe2-405d-b041-36cbc626d015" />
+<img width="1536" height="1024" alt="Path Of Calling DIagrams" src="https://github.com/user-attachments/assets/c1c9e5ff-abe2-405d-b041-36cbc626d015" />## Überblick
+
+**Kurz gesagt:**  
+Path of Calling ist ein kleines Selbstentwicklungs-Spiel.  
+Du spielst einen Charakter, aber deine echte Arbeit im realen Leben
+macht deinen Charakter stärker.
+
+**Kern-Idee:**
+
+- Du machst einen **Persönlichkeitstest** → bekommst einen **Archetyp**
+- Jeder Archetyp gehört zu einem **Gott** (St. Michael, Hachiman, Thor, Hermes)
+- Du kämpfst in der Konsole gegen **innere Schatten**
+- Du kannst **echte Aufgaben im Alltag** benutzen, um Boni im Kampf zu bekommen
+- Nur wer seine Aufgaben wirklich macht, bekommt am Ende seine **Ultimate-Fähigkeit**
+
+  ## Gameplay-Loop (Ablauf des Spiels)
+
+1. **Neues Spiel starten**
+   - Im Hauptmenü kannst du ein neues Spiel starten.
+   - Du gibst deinen Namen ein.
+   - Dein Charakter startet mit Basiswerten:
+     - Strength
+     - Discipline
+     - Courage
+     - Wisdom
+     - Creativity
+
+2. **5 Prüfungslevel mit je 4 Fragen (insgesamt 20 Fragen)**  
+   - Die Fragen sind in 5 Level aufgeteilt (Level 1–5, jeweils 4 Fragen).
+   - Jede Frage wird im Namen einer Gottheit gestellt (z. B. Thor, Hachiman, Hermes, St. Michael).
+   - Deine Antworten geben im Hintergrund Punkte auf die Archetypen:
+     - Knight
+     - Samurai
+     - Viking
+     - Bard
+
+3. **Nach jedem Level: Kampf gegen einen inneren Schatten**
+   - Nach 4 Fragen kommt ein kleiner Schatten-Kampf.
+   - Das Kampfsystem ist würfelbasiert (W6).
+   - In jeder Runde wählst du eine **Haltung**:
+     - Aggressiv → mehr Angriffswürfel
+     - Ausgeglichen → gleiche Anzahl Angriff / Verteidigung
+     - Defensiv → mehr Verteidigungswürfel
+   - Der Schaden wird berechnet aus:
+     - deinem Würfelwurf,
+     - deinen Stats (Strength / Discipline),
+     - möglichen Bonuspunkten.
+
+   - Einmal pro Kampf kannst du sagen:  
+     **„Ich habe heute eine reale Aufgabe erledigt.“**
+     - Dann bekommst du **+2 permanente Bonuspunkte** für diesen Kampf.
+     - Du kannst wählen:
+       - +2 Angriff  
+       - oder +2 Verteidigung  
+       - oder +1 Angriff und +1 Verteidigung
+
+4. **Nach 20 Fragen: Archetyp-Bestimmung**
+   - Alle Antworten werden ausgewertet.
+   - Der Archetyp mit den meisten Punkten wird dein Weg:
+     - **Knight**, **Samurai**, **Viking** oder **Bard**
+   - `PlayerArchetypeSetup` setzt deine Startwerte so,
+     dass sie zu deinem Archetyp passen
+     (z. B. Ritter mehr Verteidigung, Wikinger mehr Angriff).
+
+5. **Finaler Schattenkampf (großer Schatten deines Archetyps)**
+   - Du kämpfst jetzt gegen den großen Schatten deines Archetyps:
+     - Knight → The Sloth  
+     - Samurai → The Chaos  
+     - Viking → The Weakling  
+     - Bard → The Judge
+   - In diesem Kampf kannst du deine **Archetypen-Angriffe** benutzen:
+     - Light
+     - Heavy
+     - Skill
+   - Wenn du gewinnst, fragt das Spiel dich:
+     > „Hast du deine reale Prüfungsaufgabe (Deep Quest) heute wirklich erfüllt?“
+
+   - Deine Antwort:
+     - **Ja** → `UltimateUnlocked = true`  
+       → du schaltest deine Ultimate-Fähigkeit frei (für spätere Kämpfe, z. B. Gott-Kampf)
+     - **Nein** → keine Ultimate, der Weg ist noch nicht zu Ende
+
+6. **(Ausblick) Gott-Prüfung**
+   - In einer späteren Version soll ein **Final God Trial** kommen.
+   - Dort kämpfst du mit deiner Ultimate-Fähigkeit gegen den Gott deines Archetyps.
+  
+     ## Psychologischer Test: 20 Fragen (Kurzbeschreibung)
+
+Der Test besteht aus 20 Fragen. Jede Frage gibt im Hintergrund Punkte
+für einen oder mehrere Archetypen (Knight, Samurai, Viking, Bard).
+
+Die Fragen bauen auf einfachen psychologischen Dimensionen auf:
+
+- **E** – Extraversion / Sensation Seeking / Risikofreude  
+- **I** – Introversion / Nachdenken / Ruhe  
+- **L** – Gewissenhaftigkeit / Pflicht / Moral  
+- **N** – emotionale Reaktion (Stimmung, Angst, Schuld)
+
+Zu jeder Frage gibt es:
+
+- eine kurze Beschreibung,
+- ein Fantasy-Szenario (z. B. Fest, Schlacht, Dorfbewohner, Reise),
+- eine XP-Logik, z. B.:
+  - Antwort 1 = 1.0 Punkt
+  - Antwort 2 = 2.5 Punkte
+  - Antwort 3 = 4.0 Punkte
+
+Im Code sind die Fragen in **5 Level à 4 Fragen** organisiert.
+Die Logik steckt in `PersonalityTestService`.
+
+> **Hinweis:**  
+> Die vollständige Liste der 20 Fragen liegt in:
+> - `docs/Fragenkatalog.md` (optional)
+> - oder direkt im Code in `PersonalityTestService` / `PersonalityQuestion`.
+
+## Technische Struktur
+
+- **Sprache/Runtime:** C# (.NET)  
+- **Typ:** Konsolen-Anwendung
+
+### Wichtige Klassen und Dateien
+
+- `Program` / `Game`
+  - Einstiegspunkt ins Spiel.
+  - Hauptmenü: Neues Spiel, (später) Fortsetzen, Beenden.
+
+- `Player`, `StatType`, `PlayerArchetypeSetup`
+  - `Player`: Name, ArchetypeId, Level, Stats, UltimateUnlocked.
+  - Stats:
+    - Strength
+    - Discipline
+    - Courage
+    - Wisdom
+    - Creativity
+  - `PlayerArchetypeSetup`: verteilt die Startpunkte je nach Archetyp.
+
+- `PersonalityQuestion`, `Question`, `PersonalityTestService`
+  - Logik des Persönlichkeitstests.
+  - 20 Fragen in 5 Leveln.
+  - Nach jedem Level: Schattenkampf.
+  - Am Ende: Archetyp wird bestimmt.
+
+- `Archetype`, `ArchetypeRepository`
+  - Daten zu Knight, Samurai, Viking, Bard.
+
+- `Deity`, `DeityRepository`
+  - Verknüpft jeden Archetyp mit seinem Gott.
+
+- `ShadowEnemy`, `ShadowEnemyRepository`
+  - Kleine Schatten (für Level 1–4) und großer Archetyp-Schatten.
+  - Beispiel:  
+    - Knight → Sloth (Lähmung)  
+    - Samurai → Chaos  
+    - Viking → Weakling (Angst, Schwäche)  
+    - Bard → Judge (Urteil, Scham)
+
+- `ShadowCombatService`
+  - Kampfsystem mit W6-Würfeln gegen Schatten.
+  - Pro Runde Haltung wählen (angriffslastig, ausgeglichen, defensiv).
+  - Einmal pro Kampf: echte Aufgabe einlösen → +2 Punkte.
+
+- `CombatMove`, `ArchetypeCombatRepository`
+  - Attacken pro Archetyp:
+    - Light, Heavy, Skill, (Ultimate).
+  - Im finalen Schattenkampf werden diese Moves genutzt
+    (Ultimate nur freigeschaltet, wenn `UltimateUnlocked == true` – für späteren Gott-Kampf).
+
+- `SaveService` (wenn vorhanden)
+  - Einfaches Speichern und Laden von Spielstand-Daten
+    (z. B. Name, Archetyp, Stats, Fortschritt).
+
+---
+
+## Entwicklung & Herausforderungen (Tag 1–6)
+
+### Tag 1 – Idee & Grundstruktur
+
+- Ich habe die Grund-Idee entwickelt:
+  - psychologischer Test → Archetyp → Gott → Schatten → reale Aufgaben.
+- Entscheidung:
+  - C# Konsolen-App,
+  - Fokus auf Logik statt Grafik.
+- Schwierigkeit:
+  - Viele Ideen (Hades, Inuyasha, South Park, Psychologie, Self-Improvement)
+    auf ein kleines, machbares Projekt herunterbrechen.
+
+---
+
+### Tag 2 – Menü & Game-Flow
+
+- Ich habe die `Game`-Klasse erstellt und ein Hauptmenü gebaut.
+- Funktionen:
+  - Neues Spiel starten,
+  - Beenden,
+  - Platz für später: Fortsetzen, Einstellungen.
+- Schwierigkeit:
+  - Den Code so zu strukturieren, dass später neue Module (Test, Kämpfe, Save-System)
+    leicht eingebaut werden können.
+
+---
+
+### Tag 3 – Persönlichkeitstest
+
+- Ich habe die 20 Fragen geschrieben, mit psychologischen Dimensionen (E/I/L/N).
+- Im Code:
+  - `PersonalityQuestion`, `Question`, `PersonalityTestService`.
+  - Die Fragen sind in 5 Leveln organisiert.
+- Nach jedem Level gibt es einen kleinen Schattenkampf.
+- Schwierigkeit:
+  - Die Fragen so zu bauen, dass sie **logisch** zu Knight/Samurai/Viking/Bard passen,
+    aber trotzdem leicht verständlich sind.
+
+---
+
+### Tag 4 – Archetypen, Götter und Schatten
+
+- Ich habe die 4 Archetypen als eigene Daten angelegt:
+  - Knight, Samurai, Viking, Bard.
+- Dazu passende Götter:
+  - St. Michael, Hachiman, Thor, Hermes.
+- Ich habe die Spielerstruktur erweitert:
+  - Stats, ArchetypeId, UltimateUnlocked.
+- Dazu kam das Schatten-System:
+  - Kleine Schatten pro Level,
+  - großer Archetyp-Schatten.
+- Schwierigkeit:
+  - Die Schatten so zu formulieren, dass sie wirklich wie innere Schwächen wirken
+    (z. B. Lähmung, Chaos, Angst, Urteil).
+
+---
+
+### Tag 5 – Würfel-Kampfsystem
+
+- Ich habe `ShadowCombatService` geschrieben.
+- Pro Runde:
+  - Haltung wählen: aggressiv / ausgeglichen / defensiv.
+  - Mit einem W6 (oder mehreren Slots) werden Angriff und Verteidigung berechnet.
+- Einmal pro Kampf:
+  - Der Spieler kann sagen, dass er eine echte Aufgabe erledigt hat.
+  - Dafür gibt es +2 Bonuspunkte für den Rest des Kampfes.
+- Schwierigkeit:
+  - Kampf sollte nicht wie ein Casino wirken,
+    sondern mit Entscheidungen + realen Aufgaben verbunden sein.
+
+---
+
+### Tag 6 – Archetypen-Angriffe & Ultimate-Freischaltung
+
+- Ich habe `CombatMove` und `ArchetypeCombatRepository` erstellt:
+  - Light, Heavy, Skill, Ultimate pro Archetyp.
+- Im finalen Schattenkampf kann der Spieler diese Moves nutzen.
+- Nach dem Sieg über den großen Schatten:
+  - Das Spiel fragt die „Deep Quest“-Frage.
+  - Nur wenn der Spieler ehrlich sagt, dass er seine reale Aufgabe erfüllt hat,
+    wird `UltimateUnlocked` auf `true` gesetzt und seine Ultimate benannt.
+- Schwierigkeit:
+  - Unter Zeitdruck trotzdem ein sauberes System zu bauen,
+    das später für einen Gott-Kampf weiterverwendet werden kann.
+
+---
+
+## Installation & Start
+
+1. Projekt herunterladen oder klonen.
+2. In einer IDE öffnen:
+   - Visual Studio,
+   - Rider oder
+   - VS Code mit C#-Extension.
+3. Projekt bauen und starten:
+   - über die IDE oder
+   - über die Konsole:
+
+   ```bash
+   dotnet run
+
 
 ## Psychologischer Test: 20 Fragen
 
-### Frage 1
-**Haben Sie oft das Bedürfnis nach neuen Eindrücken, nach Abwechslung und Aufregung?**
-- Trait: E (Sensation Seeking)
-- Charakter: Viking, Bard
-- Szenario: Dein Charakter steht vor einem Fest in der Stadt. Du kannst entweder bleiben und trainieren (Disziplin) oder dich ins Getümmel stürzen, um neue Kontakte zu knüpfen und Abenteuer zu erleben.
-- XP-Logik: Routine = 1.0 | Abenteuer = 2.5 | Risiko = 4.0
+[Uploading Fragenkatalog_PathOfCalling.pdf…]()
 
-### Frage 2
-**Denken Sie nach, bevor Sie etwas unternehmen?**
-- Trait: I (Überlegtheit)
-- Charakter: Samurai, Knight
-- Szenario: Vor einer Schlacht musst du entscheiden: sofort angreifen oder zuerst die Lage analysieren. Samurai und Ritter gewinnen XP für Geduld und Strategie.
-- XP-Logik: Schnelle Aktion = 1.0 | Analyse = 2.5 | Perfekte Planung = 4.0
+Hans Eysenck persönlichkeitsmodell test
+https://personalio.org/email
 
-### Frage 3
-**Wenn Sie etwas versprechen, halten Sie Ihr Versprechen immer ein?**
-- Trait: L (Gewissenhaftigkeit)
-- Charakter: Samurai, Knight
-- Szenario: Ein Dorfbewohner bittet um Hilfe. Du hast andere Pläne, aber deine Ehre steht auf dem Spiel. Halte dein Versprechen für XP in Pflichtbewusstsein.
-- XP-Logik: Ignorieren = 0 | Helfen = 2.5 | Sofortige Hilfe = 4.0
 
-### Frage 4
-**Haben Sie oft Stimmungsschwankungen?**
-- Trait: N (Emotionale Instabilität)
-- Charakter: Bard (Emotionen), Viking (Wut)
-- Szenario: Dein Charakter erlebt eine Niederlage. Du kannst entweder deine Emotionen in ein Lied verwandeln (Bard) oder in einen Kampfkanal (Viking).
-- XP-Logik: Resignation = 0 | Kreative Verarbeitung = 2.5 | Mutige Aktion = 4.0
-
-### Frage 5
-**Handeln und sprechen Sie immer schnell, ohne nachzudenken?**
-- Trait: E (Impulsivität)
-- Charakter: Viking
-- Szenario: Ein Feind provoziert dich. Du kannst sofort angreifen oder eine Falle stellen. Viking erhält XP für schnelle Reaktion.
-- XP-Logik: Impulsiv = 2.5 | Geplant = 4.0
-
-### Frage 6
-**Fühlen Sie sich oft ohne Grund unglücklich?**
-- Trait: N (Angst)
-- Charakter: —
-- Szenario: Dein Charakter ist niedergeschlagen. Du kannst meditieren (Samurai) oder Trost bei Freunden suchen (Bard).
-- XP-Logik: Ignorieren = 0 | Meditation = 2.5 | Soziale Heilung = 4.0
-
-### Frage 7
-**Interessieren Sie sich für Wetten oder Herausforderungen?**
-- Trait: E (Risikofreude)
-- Charakter: Viking, Bard
-- Szenario: Ein Glücksspiel im Gasthaus. Du kannst teilnehmen oder ablehnen. Viking und Bard erhalten XP für Mut und soziale Interaktion.
-- XP-Logik: Ablehnen = 0 | Teilnahme = 2.5 | Gewinn = 4.0
-
-### Frage 8
-**Waren Sie jemals wütend, wenn jemand Sie übertroffen hat?**
-- Trait: N (Aggression)
-- Charakter: Viking
-- Szenario: Ein Krieger übertrifft dich im Wettkampf. Du kannst trainieren (Samurai) oder ihn herausfordern (Viking).
-- XP-Logik: Ignorieren = 0 | Training = 2.5 | Herausforderung = 4.0
-
-### Frage 9
-**Machen Sie sich oft Sorgen über Dinge, die Sie gesagt oder getan haben?**
-- Trait: N (Schuld/Angst)
-- Charakter: Knight
-- Szenario: Du hast einen Fehler im Kampf gemacht. Du kannst Buße tun (Knight) oder ignorieren. XP für Ehre und Pflicht.
-- XP-Logik: Ignorieren = 0 | Buße = 2.5 | Öffentliche Entschuldigung = 4.0
-
-### Frage 10
-**Bevorzugen Sie Bücher gegenüber Treffen mit Menschen?**
-- Trait: I (Introversion)
-- Charakter: Samurai
-- Szenario: Du hast Freizeit. Du kannst meditieren oder eine Feier besuchen. Samurai erhält XP für Fokus.
-- XP-Logik: Feier = 1.0 | Lesen = 2.5 | Meditation = 4.0
-
-### Frage 11
-**Sind Sie gerne in Gesellschaft?**
-- Trait: E (Geselligkeit)
-- Charakter: Bard
-- Szenario: Ein Fest beginnt. Du kannst auftreten (Bard) oder allein bleiben. XP für soziale Interaktion.
-- XP-Logik: Allein = 0 | Teilnahme = 2.5 | Auftritt = 4.0
-
-### Frage 12
-**Haben Sie manchmal Gedanken, die Sie verbergen möchten?**
-- Trait: L (Unvollkommenheit)
-- Charakter: Bard
-- Szenario: Du kannst deine Geheimnisse in ein Lied verwandeln oder sie für Intrigen nutzen. XP für Kreativität.
-- XP-Logik: Ignorieren = 0 | Lied = 2.5 | Intrige = 4.0
-
-### Frage 13
-**Bevorzugen Sie beim Reisen Landschaften gegenüber Gesprächen?**
-- Trait: I (Kontemplation)
-- Charakter: Samurai
-- Szenario: Du reist durch ein fremdes Land. Du kannst meditieren oder neue Freunde finden. Samurai erhält XP für Fokus.
-- XP-Logik: Gespräch = 1.0 | Landschaft = 2.5 | Meditation = 4.0
-
-### Frage 14
-**Sind Sie immer bereit, einem Bedürftigen zu helfen?**
-- Trait: L (Altruismus)
-- Charakter: Knight
-- Szenario: Ein Dorfbewohner bittet um Hilfe. Du kannst helfen oder ablehnen. XP für Pflichtbewusstsein.
-- XP-Logik: Ablehnen = 0 | Helfen = 2.5 | Sofortige Hilfe = 4.0
-
-### Frage 15
-**Können Sie Ihre Gefühle in Gesellschaft frei zeigen und ausgelassen feiern?**
-- Trait: E (Enthemmung)
-- Charakter: Bard, Viking
-- Szenario: Ein Fest beginnt. Du kannst tanzen (Bard) oder kämpfen (Viking). XP für Ausdruckskraft.
-- XP-Logik: Passiv = 0 | Tanzen = 2.5 | Kampf = 4.0
-
-### Frage 16
-**Sind Sie in Gesellschaft eher still?**
-- Trait: I (Zurückhaltung)
-- Charakter: Samurai, Knight
-- Szenario: Du bist in einer Versammlung. Du kannst zuhören oder sprechen. Samurai und Knight erhalten XP für Ruhe.
-- XP-Logik: Sprechen = 1.0 | Zuhören = 2.5 | Meditation = 4.0
-
-### Frage 17
-**Klatschen Sie manchmal?**
-- Trait: L (Niedrige Gewissenhaftigkeit)
-- Charakter: Bard
-- Szenario: Du kannst Gerüchte verbreiten oder sie in ein Lied verwandeln. XP für Kreativität.
-- XP-Logik: Ignorieren = 0 | Lied = 2.5 | Intrige = 4.0
-
-### Frage 18
-**Gehen Sie langsam und bedächtig?**
-- Trait: I (Niedrige Aktivität)
-- Charakter: Samurai
-- Szenario: Du kannst langsam gehen (Fokus) oder rennen (Viking). XP für Ruhe.
-- XP-Logik: Rennen = 1.0 | Gehen = 2.5 | Meditation = 4.0
-
-### Frage 19
-**Wären Sie sehr unglücklich, wenn Sie lange Zeit ohne soziale Kontakte wären?**
-- Trait: E (Soziale Bedürftigkeit)
-- Charakter: Bard
-- Szenario: Du bist isoliert. Du kannst ein Lied schreiben oder Freunde suchen. XP für soziale Interaktion.
-- XP-Logik: Ignorieren = 0 | Lied = 2.5 | Treffen = 4.0
-
-### Frage 20
-**Können Sie leicht Leben in eine langweilige Gesellschaft bringen?**
-- Trait: E (Dominanz)
-- Charakter: Bard
-- Szenario: Du kannst eine Rede halten oder Musik spielen. XP für Inspiration.
-- XP-Logik: Passiv = 0 | Rede = 2.5 | Musik = 4.0
 
 ---
-## Pantheon Details (Erweitert)
+## Pantheon Details 
 
-### Knight (Melancholic)
-- **Hauptgott:** St. Michael (Christliche Tradition)
-- **Symbolische Bedeutung:** Schutzpatron der Ritter, Verkörperung von Mut, Pflicht und Gerechtigkeit.
-- **Stärken:** Tapferkeit, Verteidigung der Schwachen, moralische Integrität.
-- **Typische Aufgaben:**
-  - "Schütze ein Dorf vor Angreifern"
-  - "Hilf einem Bedürftigen in Not"
-  - "Verteidige die Ehre eines Freundes"
-- **Quests:**
-  - "Organisiere eine Hilfsaktion für die Armen"
-  - "Trainiere Ausdauer und Geduld durch einen langen Marsch"
+[Pantheon.docx](https://github.com/user-attachments/files/24071059/Pantheon.docx)
 
-### Samurai (Phlegmatic)
-- **Hauptgott:** Hachiman (Shinto)
-- **Symbolische Bedeutung:** Gott des Krieges und der Kampfkunst, Patron des Bushido (Weg des Kriegers).
-- **Stärken:** Disziplin, Fokus, Reinheit der Absichten.
-- **Typische Aufgaben:**
-  - "Meditation für geistige Klarheit"
-  - "Übe Kalligrafie für Präzision"
-  - "Trainiere eine Kampfkunst für Meisterschaft"
-- **Quests:**
-  - "Folge einem strengen Tagesritual"
-  - "Lerne eine neue Technik in der Kampfkunst"
+  ## Technische Struktur
 
-### Viking (Choleric)
-- **Hauptgott:** Thor (Nordische Mythologie)
-- **Symbolische Bedeutung:** Gott des Donners und des Kampfes, Verkörperung von Stärke und Schutz.
-- **Stärken:** Mut, rohe Kraft, Entschlossenheit.
-- **Typische Aufgaben:**
-  - "Nimm an einem Wettkampf teil"
-  - "Bestehe eine körperliche Herausforderung"
-  - "Erkunde unbekannte Gebiete"
-- **Quests:**
-  - "Organisiere ein Training für Kraft und Ausdauer"
-  - "Stelle dich einem gefährlichen Gegner"
+- **Sprache/Runtime**: C# (.NET)
+- **Projekt-Typ**: Konsolenanwendung
 
-### Bard (Sanguine)
-- **Hauptgott:** Hermes (Griechische Mythologie)
-- **Symbolische Bedeutung:** Gott der Kommunikation, Reisenden, Handel und Diplomatie.
-- **Stärken:** Schnelligkeit, Verhandlungsgeschick, soziale Intelligenz.
-- **Typische Aufgaben:**
-  - "Networking bei einem Fest"
-  - "Vermittle Frieden zwischen zwei Parteien"
-  - "Reise und knüpfe neue Kontakte"
-- **Quests:**
-  - "Organisiere ein gesellschaftliches Ereignis"
-  - "Schließe einen Handel mit einem fremden Stamm"
+Wichtige Klassen/Module:
+
+- `Program` / `Game`  
+  Einstiegspunkt, Hauptmenü (Neues Spiel, ggf. Fortsetzen, Beenden).
+
+- `Player`, `StatType`, `PlayerArchetypeSetup`  
+  Repräsentation des Spielers, 5 Kernwerte (Strength, Discipline, Courage, Wisdom, Creativity),
+  Zuweisung der Startwerte je nach Archetyp.
+
+- `PersonalityQuestion`, `Question`, `PersonalityTestService`  
+  20 Fragen, gruppiert in 5 Level à 4 Fragen.  
+  Nach jedem Level: Auswertung + Kampf gegen einen kleinen Schatten.
+
+- `Archetype`, `ArchetypeRepository`  
+  Definition der vier Archetypen (Knight, Samurai, Viking, Bard).
+
+- `Deity`, `DeityRepository`  
+  Verknüpfung der Archetypen mit den Göttern (St. Michael, Hachiman, Thor, Hermes).
+
+- `ShadowEnemy`, `ShadowEnemyRepository`  
+  Kleine Schatten (Level 1–4) und großer Archetyp-Schatten nach der finalen Prüfung.
+
+- `ShadowCombatService`  
+  Würfelbasiertes Kampfsystem gegen Schatten:
+  - Haltungen (aggressiv, ausgeglichen, defensiv),
+  - W6-Würfe für Angriff und Verteidigung,
+  - Einmaliger Real-Life-Bonus (+2 Punkte).
+
+- `ArchetypeCombatRepository`, `CombatMove`  
+  vordefinierte Angriffe und Fähigkeiten pro Archetyp (Light, Heavy, Skill, Ultimate).
+  Werden im finalen Schattenkampf verwendet.
+
+  ## Gameplay-Loop
+
+1. **Neues Spiel starten**
+   - Spieler gibt seinen Namen ein.
+   - Start mit Basiswerten.
+
+2. **5 Prüfungslevel mit je 4 Fragen**
+   - Jede Frage wird im Namen eines Gottes gestellt.
+   - Antworten erhöhen die versteckten Scores der Archetypen.
+
+3. **Nach jedem Level: Kampf gegen einen inneren Schatten**
+   - Würfel-basiertes System (W6).
+   - Spieler verteilt seinen Fokus pro Runde auf Angriff/Verteidigung.
+   - Optional: reale Aufgabe melden → +2 permanente Bonuspunkte.
+
+4. **Nach 20 Fragen: Archetyp-Bestimmung**
+   - Höchster Score entscheidet zwischen Knight / Samurai / Viking / Bard.
+   - `PlayerArchetypeSetup` weist passende Startwerte zu.
+
+5. **Finaler Schattenkampf**
+   - Kampf gegen den großen Schatten des Archetyps.
+   - Nutzung der Archetypen-Fähigkeiten (Light/Heavy/Skill).
+   - Bei Sieg → Abfrage einer realen Deep-Quest.
+   - Nur bei bestätigter Aufgabe → `UltimateUnlocked = true`.
+
+6. **(Ausblick) Gott-Prüfung**
+   - In einem weiteren Schritt kann ein Final God Trial implementiert werden,
+     bei dem der Spieler mit seiner Ultimate-Fähigkeit gegen den Gott kämpft.
 
 
 ## Übersichtstabelle
